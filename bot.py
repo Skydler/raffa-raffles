@@ -1,11 +1,7 @@
 from selenium import webdriver
+from selenium.common.exceptions import NoSuchElementException
+import logging
 import time
-
-driver = webdriver.Chrome(executable_path="./chromedriver")
-driver.get("https://scrap.tf/raffles")
-
-print("Please sign in through STEAM master...")
-input("Is it finished? ")
 
 
 def get_raffles():
@@ -19,14 +15,35 @@ def get_raffles():
 
 def enter_raffle(raffle):
     driver.get(raffle)
-    div_btns = driver.find_element_by_class_name("enter-raffle-btns")
-    btn = div_btns.find_element_by_css_selector("button:not(#raffle-enter)")
-    btn.click()
+    try:
+        div_btns = driver.find_element_by_class_name("enter-raffle-btns")
+        div_btns.find_element_by_css_selector(
+            "button:not(#raffle-enter)").click()
+    except NoSuchElementException as e:
+        logging.error(
+            "Couldn't find 'Enter raffle' button. Are you signed in?\n")
+        raise e
+
+    subtitle = driver.find_element_by_class_name("subtitle").text
+    logging.info(f"Entered to: {subtitle}")
 
 
-raffles = get_raffles()
-for raffle in raffles:
-    time.sleep(3)
-    enter_raffle(raffle)
+if __name__ == "__main__":
+    logging.basicConfig(level=logging.INFO,
+                        format='%(asctime)s - %(levelname)s - %(message)s',
+                        datefmt='%H:%M:%S')
+    driver = webdriver.Chrome(executable_path="./chromedriver")
+    driver.get("https://scrap.tf/raffles")
 
-driver.close()
+    print("Please sign in through STEAM master...")
+    input("Is it finished? ")
+
+    print("Starting execution...")
+
+    raffles = get_raffles()
+    print(f"Found {len(raffles)} raffles!")
+    for raffle in raffles:
+        time.sleep(3)
+        enter_raffle(raffle)
+
+    driver.close()
