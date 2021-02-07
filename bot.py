@@ -19,13 +19,11 @@ def enter_raffle(raffle):
         div_btns = driver.find_element_by_class_name("enter-raffle-btns")
         div_btns.find_element_by_css_selector(
             "button:not(#raffle-enter)").click()
-    except NoSuchElementException as e:
-        logging.error(
-            "Couldn't find 'Enter raffle' button. Are you signed in?\n")
-        raise e
-
-    subtitle = driver.find_element_by_class_name("subtitle").text
-    logging.info(f"Entered to: {subtitle}")
+    except NoSuchElementException:
+        logging.error("Couldn't find 'Enter raffle' button")
+    else:
+        subtitle = driver.find_element_by_class_name("subtitle").text
+        logging.info(f"Entered to: {subtitle}")
 
 
 if __name__ == "__main__":
