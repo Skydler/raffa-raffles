@@ -1,6 +1,7 @@
 from selenium import webdriver
 from selenium.common.exceptions import NoSuchElementException
 import logging
+import progressbar
 import time
 
 
@@ -27,9 +28,8 @@ def enter_raffle(raffle):
 
 
 if __name__ == "__main__":
-    logging.basicConfig(level=logging.INFO,
-                        format='%(asctime)s - %(levelname)s - %(message)s',
-                        datefmt='%H:%M:%S')
+    progressbar.streams.wrap_stderr()
+    logging.basicConfig(level=logging.INFO, format='%(levelname)s:%(message)s')
     driver = webdriver.Chrome(executable_path="./chromedriver")
     driver.get("https://scrap.tf/raffles")
 
@@ -40,7 +40,7 @@ if __name__ == "__main__":
 
     raffles = get_raffles()
     print(f"Found {len(raffles)} raffles!")
-    for raffle in raffles:
+    for raffle in progressbar.progressbar(raffles):
         time.sleep(3)
         enter_raffle(raffle)
 
