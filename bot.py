@@ -1,8 +1,9 @@
-from selenium import webdriver
-from selenium.common.exceptions import NoSuchElementException
-import logging
-import progressbar
 import time
+import progressbar
+import logging
+from selenium import webdriver
+from selenium.common.exceptions import (NoSuchElementException,
+                                        ElementNotInteractableException)
 
 
 def get_raffles():
@@ -20,7 +21,7 @@ def enter_raffle(raffle):
         div_btns = driver.find_element_by_class_name("enter-raffle-btns")
         div_btns.find_element_by_css_selector(
             "button:not(#raffle-enter)").click()
-    except NoSuchElementException:
+    except (NoSuchElementException, ElementNotInteractableException):
         logging.error("Couldn't find 'Enter raffle' button")
     else:
         subtitle = driver.find_element_by_class_name("subtitle").text
