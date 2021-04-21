@@ -6,6 +6,16 @@ from selenium.common.exceptions import (NoSuchElementException,
                                         ElementNotInteractableException)
 
 
+def scroll_to_end():
+    # Wait till page loads
+    driver.find_element_by_css_selector(".big-logo")
+
+    for _ in range(3):
+        driver.execute_script(
+            "window.scrollTo(0, document.body.scrollHeight);")
+        time.sleep(1)
+
+
 def get_raffles():
     css_selector = ".panel-raffle:not(.raffle-entered)"
     raffle_boxes = driver.find_elements_by_css_selector(css_selector)
@@ -31,14 +41,16 @@ def enter_raffle(raffle):
 if __name__ == "__main__":
     progressbar.streams.wrap_stderr()
     logging.basicConfig(level=logging.INFO, format='%(levelname)s:%(message)s')
-    driver = webdriver.Chrome(executable_path="./chromedriver")
+
+    options = webdriver.ChromeOptions()
+    options.add_argument(r"--user-data-dir=selenium_chrome_profile")
+    driver = webdriver.Chrome(
+        executable_path="./chromedriver", options=options)
+    driver.implicitly_wait(5)
+
     driver.get("https://scrap.tf/raffles")
-
-    print("Please sign in through STEAM master...")
-    input("Is it finished? ")
-
+    scroll_to_end()
     print("Starting execution...")
-
     raffles = get_raffles()
     print(f"Found {len(raffles)} raffles!")
     for raffle in progressbar.progressbar(raffles):
