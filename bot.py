@@ -43,9 +43,9 @@ if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO, format='%(levelname)s:%(message)s')
 
     options = webdriver.ChromeOptions()
-    options.add_argument(r"--user-data-dir=selenium_chrome_profile")
+    options.add_argument(r"--user-data-dir=./selenium/selenium_chrome_profile")
     driver = webdriver.Chrome(
-        executable_path="./chromedriver", options=options)
+        executable_path="./selenium/chromedriver", options=options)
     driver.implicitly_wait(5)
 
     driver.get("https://scrap.tf/raffles")
