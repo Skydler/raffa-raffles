@@ -5,8 +5,62 @@ from selenium import webdriver
 from selenium.common.exceptions import (NoSuchElementException,
                                         ElementNotInteractableException)
 
+SELENIUM_FOLDER = "./selenium"
+PROFILE_FOLDER = f"{SELENIUM_FOLDER}/selenium_chrome_profile"
 
-def scroll_to_end():
+
+def check_for_profile():
+    try:
+        with open(f"{PROFILE_FOLDER}/First Run", "r"):
+            has_file = True
+    except IOError:
+        logging.warning("Chrome profile not found")
+        has_file = False
+
+    return has_file
+
+
+def run_raffle_bot():
+    options = webdriver.ChromeOptions()
+    options.add_argument(f"--user-data-dir={PROFILE_FOLDER}")
+    options.add_argument(r"headless")
+    driver = webdriver.Chrome(
+        executable_path=f"{SELENIUM_FOLDER}/chromedriver", options=options)
+    driver.implicitly_wait(5)
+
+    logging.info("Loading scraptf website")
+    driver.get("https://scrap.tf/raffles")
+
+    logging.info("Scrolling to the end of the webpage...")
+    scroll_to_end(driver)
+
+    logging.info("Starting execution...")
+    raffles = get_raffles(driver)
+
+    logging.info(f"Found {len(raffles)} raffles!")
+    for raffle in progressbar.progressbar(raffles):
+        time.sleep(3)
+        enter_raffle(driver, raffle)
+
+    driver.close()
+
+
+def login():
+    options = webdriver.ChromeOptions()
+    options.add_argument(f"--user-data-dir={PROFILE_FOLDER}")
+    driver = webdriver.Chrome(
+        executable_path=f"{SELENIUM_FOLDER}/chromedriver", options=options)
+    driver.implicitly_wait(5)
+
+    logging.info("Loading scraptf website")
+    driver.get("https://scrap.tf/raffles")
+
+    logging.info("Please login to scraptf")
+    input("Press enter when it's ready ^.^\n")
+    driver.close()
+
+
+def scroll_to_end(driver):
     # Wait till page loads
     driver.find_element_by_css_selector(".big-logo")
 
@@ -16,7 +70,7 @@ def scroll_to_end():
         time.sleep(1)
 
 
-def get_raffles():
+def get_raffles(driver):
     css_selector = ".panel-raffle:not(.raffle-entered)"
     raffle_boxes = driver.find_elements_by_css_selector(css_selector)
     raffles = list(map(
@@ -25,7 +79,7 @@ def get_raffles():
     return raffles
 
 
-def enter_raffle(raffle):
+def enter_raffle(driver, raffle):
     driver.get(raffle)
     try:
         div_btns = driver.find_element_by_class_name("enter-raffle-btns")
@@ -42,21 +96,8 @@ if __name__ == "__main__":
     progressbar.streams.wrap_stderr()
     logging.basicConfig(level=logging.INFO, format='%(levelname)s:%(message)s')
 
-    options = webdriver.ChromeOptions()
-    options.add_argument(r"--user-data-dir=./selenium/selenium_chrome_profile")
-    options.add_argument(r"headless")
-    driver = webdriver.Chrome(
-        executable_path="./selenium/chromedriver", options=options)
-    driver.implicitly_wait(5)
-    logging.info("Loading scraptf website")
-    driver.get("https://scrap.tf/raffles")
-    logging.info("Scrolling to the end of the webpage...")
-    scroll_to_end()
-    logging.info("Starting execution...")
-    raffles = get_raffles()
-    logging.info(f"Found {len(raffles)} raffles!")
-    for raffle in progressbar.progressbar(raffles):
-        time.sleep(3)
-        enter_raffle(raffle)
-
-    driver.close()
+    profile_exists = check_for_profile()
+    if profile_exists:
+        run_raffle_bot()
+    else:
+        login()
