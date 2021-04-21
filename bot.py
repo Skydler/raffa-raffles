@@ -44,15 +44,17 @@ if __name__ == "__main__":
 
     options = webdriver.ChromeOptions()
     options.add_argument(r"--user-data-dir=./selenium/selenium_chrome_profile")
+    options.add_argument(r"headless")
     driver = webdriver.Chrome(
         executable_path="./selenium/chromedriver", options=options)
     driver.implicitly_wait(5)
-
+    logging.info("Loading scraptf website")
     driver.get("https://scrap.tf/raffles")
+    logging.info("Scrolling to the end of the webpage...")
     scroll_to_end()
-    print("Starting execution...")
+    logging.info("Starting execution...")
     raffles = get_raffles()
-    print(f"Found {len(raffles)} raffles!")
+    logging.info(f"Found {len(raffles)} raffles!")
     for raffle in progressbar.progressbar(raffles):
         time.sleep(3)
         enter_raffle(raffle)
