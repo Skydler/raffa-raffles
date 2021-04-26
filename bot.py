@@ -1,3 +1,5 @@
+import os
+import sys
 import time
 import progressbar
 import logging
@@ -9,9 +11,17 @@ SELENIUM_FOLDER = "./selenium"
 PROFILE_FOLDER = f"{SELENIUM_FOLDER}/selenium_chrome_profile"
 
 
+def resource_path(relative_path):
+    try:
+        base_path = sys._MEIPASS
+    except Exception:
+        base_path = os.path.dirname(__file__)
+    return os.path.join(base_path, relative_path)
+
+
 def check_for_profile():
     try:
-        with open(f"{PROFILE_FOLDER}/First Run", "r"):
+        with open(resource_path(f"{PROFILE_FOLDER}/First Run"), "r"):
             has_file = True
     except IOError:
         logging.warning("Chrome profile not found")
@@ -22,10 +32,11 @@ def check_for_profile():
 
 def run_raffle_bot():
     options = webdriver.ChromeOptions()
-    options.add_argument(f"--user-data-dir={PROFILE_FOLDER}")
+    options.add_argument(f"--user-data-dir={resource_path(PROFILE_FOLDER)}")
     options.add_argument(r"headless")
     driver = webdriver.Chrome(
-        executable_path=f"{SELENIUM_FOLDER}/chromedriver", options=options)
+        executable_path=resource_path(f"{SELENIUM_FOLDER}/chromedriver"),
+        options=options)
     driver.implicitly_wait(5)
 
     logging.info("Loading scraptf website")
@@ -47,9 +58,10 @@ def run_raffle_bot():
 
 def login():
     options = webdriver.ChromeOptions()
-    options.add_argument(f"--user-data-dir={PROFILE_FOLDER}")
+    options.add_argument(f"--user-data-dir={resource_path(PROFILE_FOLDER)}")
     driver = webdriver.Chrome(
-        executable_path=f"{SELENIUM_FOLDER}/chromedriver", options=options)
+        executable_path=resource_path(f"{SELENIUM_FOLDER}/chromedriver"),
+        options=options)
     driver.implicitly_wait(5)
 
     logging.info("Loading scraptf website")
