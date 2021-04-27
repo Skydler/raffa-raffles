@@ -30,15 +30,28 @@ def check_for_profile():
     return has_file
 
 
-def run_raffle_bot():
+def build_driver(headless=True, silent=True):
     options = webdriver.ChromeOptions()
     options.add_argument(f"--user-data-dir={resource_path(PROFILE_FOLDER)}")
-    options.add_argument(r"headless")
+    if headless:
+        options.add_argument("--headless")
+
+    if silent:
+        options.add_argument("--disable-crash-reporter")
+        options.add_argument("--disable-in-process-stack-traces")
+        options.add_argument("--disable-logging")
+        options.add_argument("--log-level=3")
+
     driver = webdriver.Chrome(
         executable_path=resource_path(f"{SELENIUM_FOLDER}/chromedriver"),
         options=options)
     driver.implicitly_wait(5)
 
+    return driver
+
+
+def run_raffle_bot():
+    driver = build_driver()
     logging.info("Loading scraptf website")
     driver.get("https://scrap.tf/raffles")
 
@@ -57,13 +70,7 @@ def run_raffle_bot():
 
 
 def login():
-    options = webdriver.ChromeOptions()
-    options.add_argument(f"--user-data-dir={resource_path(PROFILE_FOLDER)}")
-    driver = webdriver.Chrome(
-        executable_path=resource_path(f"{SELENIUM_FOLDER}/chromedriver"),
-        options=options)
-    driver.implicitly_wait(5)
-
+    driver = build_driver(headless=False)
     logging.info("Loading scraptf website")
     driver.get("https://scrap.tf/raffles")
 
