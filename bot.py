@@ -4,8 +4,11 @@ import time
 import progressbar
 import logging
 from selenium import webdriver
-from selenium.common.exceptions import (NoSuchElementException,
-                                        ElementNotInteractableException)
+from selenium.webdriver.common.by import By
+from selenium.common.exceptions import (
+    NoSuchElementException,
+    ElementNotInteractableException,
+)
 
 SELENIUM_FOLDER = "./selenium"
 PROFILE_FOLDER = f"{SELENIUM_FOLDER}/selenium_chrome_profile"
@@ -44,7 +47,8 @@ def build_driver(headless=True, silent=True):
 
     driver = webdriver.Chrome(
         executable_path=resource_path(f"{SELENIUM_FOLDER}/chromedriver"),
-        options=options)
+        options=options,
+    )
     driver.implicitly_wait(5)
 
     return driver
@@ -81,39 +85,42 @@ def login():
 
 def scroll_to_end(driver):
     # Wait till page loads
-    driver.find_element_by_css_selector(".big-logo")
+    driver.find_element(By.CSS_SELECTOR, ".big-logo")
 
     for _ in range(3):
-        driver.execute_script(
-            "window.scrollTo(0, document.body.scrollHeight);")
+        driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
         time.sleep(1)
 
 
 def get_raffles(driver):
     css_selector = ".panel-raffle:not(.raffle-entered)"
-    raffle_boxes = driver.find_elements_by_css_selector(css_selector)
-    raffles = list(map(
-        lambda r: r.find_element_by_css_selector(
-            ".raffle-name a").get_attribute("href"), raffle_boxes))
+    raffle_boxes = driver.find_elements(By.CSS_SELECTOR, css_selector)
+    raffles = list(
+        map(
+            lambda r: r.find_element(By.CSS_SELECTOR, ".raffle-name a").get_attribute(
+                "href"
+            ),
+            raffle_boxes,
+        )
+    )
     return raffles
 
 
 def enter_raffle(driver, raffle):
     driver.get(raffle)
     try:
-        div_btns = driver.find_element_by_class_name("enter-raffle-btns")
-        div_btns.find_element_by_css_selector(
-            "button:not(#raffle-enter)").click()
+        div_btns = driver.find_element(By.CSS_SELECTOR, ".enter-raffle-btns")
+        div_btns.find_element(By.CSS_SELECTOR, "button:not(#raffle-enter)").click()
     except (NoSuchElementException, ElementNotInteractableException):
         logging.error("Couldn't find 'Enter raffle' button")
     else:
-        subtitle = driver.find_element_by_class_name("subtitle").text
+        subtitle = driver.find_element(By.CSS_SELECTOR, ".subtitle").text
         logging.info(f"Entered to: {subtitle}")
 
 
 if __name__ == "__main__":
     progressbar.streams.wrap_stderr()
-    logging.basicConfig(level=logging.INFO, format='%(levelname)s:%(message)s')
+    logging.basicConfig(level=logging.INFO, format="%(levelname)s:%(message)s")
 
     profile_exists = check_for_profile()
     if profile_exists:
