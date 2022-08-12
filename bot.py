@@ -9,6 +9,7 @@ from selenium.common.exceptions import (
     NoSuchElementException,
     ElementNotInteractableException,
 )
+from webdriver_manager.chrome import ChromeDriverManager
 
 SELENIUM_FOLDER = "./selenium"
 PROFILE_FOLDER = f"{SELENIUM_FOLDER}/selenium_chrome_profile"
@@ -46,7 +47,7 @@ def build_driver(headless=True, silent=True):
         options.add_argument("--log-level=3")
 
     driver = webdriver.Chrome(
-        executable_path=resource_path(f"{SELENIUM_FOLDER}/chromedriver"),
+        executable_path=ChromeDriverManager().install(),
         options=options,
     )
     driver.implicitly_wait(5)

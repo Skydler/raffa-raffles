@@ -6,6 +6,8 @@ name = "pypi"
 [packages]
 selenium = "*"
 progressbar2 = "*"
+pyinstaller = "*"
+webdriver-manager = "*"
 
 [dev-packages]
 
