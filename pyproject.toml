@@ -1,0 +1,12 @@
+[project]
+name = "raffa-raffles"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "progressbar2>=4.5.0",
+    "selenium==3.14.0",
+    "webdriver-manager>=4.0.2",
+    "pyinstaller==5.3",
+]
